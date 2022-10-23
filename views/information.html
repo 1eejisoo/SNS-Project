@@ -1,0 +1,109 @@
+<!--프로필 상세보기를 위한 페이지-->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="/main.css">
+
+  <style>
+    .con {
+      width: 80%;
+      display: inline-block;
+      margin: 10px 0;
+      background: #FFFFFF;
+    }
+
+    .btn {
+      margin: auto;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="home-wrap">
+      <form action="/" method="post">
+        <input type="image" class="img-button" name="button" src="../img/home.jpg">
+      </form>
+    </div>
+    <div class="profile-wrap">
+      <div class="profile">
+        <div class="user-name">마이페이지</div>
+        <div class="half">
+          <div>팔로잉</div>
+          <div class="count following-count">{{followingCount}}</div>
+        </div>
+        <div class="half">
+          <div>팔로워</div>
+          <div class="count follower-count">{{followerCount}}</div>
+        </div>
+
+        <p>　</p>
+
+        <form id="modify_mypage" action="/profile" method="post">
+
+          <a>이름 : </a>
+          <div class="con" id="mynick">{{user.nick}}</div>
+          <input class="con" name="nick" id="nick" type="hidden" value="{{user.nick}}">
+          <!--기존에 숨겨져있다가 수정버튼을 누를시 나타날 닉네임변경 input-->
+          <br><a>상메 : </a>
+          <div class="con" id="mystatus">{{user.status}}</div>
+          <input class="con" name="statuss" id="status" type="hidden" value="{{user.status}}">
+          <!--기존에 숨겨져있다가 수정버튼을 누를시 나타날 상대메시지 input-->
+
+          <input id="my-id" name="my_id" type="hidden" value="{{user.id}}">
+          <!--내 id를 form에 담아서 보내준다-->
+          <button id="modify" type="button" class="btn" onClick="buttonClick(this)">수정</a>
+            <button id="ok" class="btn" type="submit" style="display:none">수정완료</button>
+            <!--기존에 숨겨져있다가 수정버튼을 누를시 나타나며, 누르면 /profile로 post 메시지를 보낸다-->
+        </form>
+
+      </div>
+    </div>
+    {% block content %}
+    {% endblock %}
+    <footer>
+      <p class="footer"><b>A+Sync</b> at Web Framework2 (B)</p>
+    </footer>
+  </div>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    window.onload = () => {
+      if (new URL(location.href).searchParams.get('loginError')) {
+        alert(new URL(location.href).searchParams.get('loginError'));
+      }
+
+      if (document.title == "유저") { //만약 유저 프로필일 경우는 수정버튼을 없애버려서 다른유저의 수정 방지
+        var modifybutton = document.getElementById("modify");
+        modifybutton.style = "display:none";
+      }
+    };
+
+    function buttonClick(btn) {
+      var mynick = document.getElementById("mynick");
+      var nick = document.getElementById("nick");
+      mynick.style = "display:none"; //기존 div 이름을 숨기고
+      nick.type = "text"; //숨겨져있던 input을 나타낸다
+
+      var mystatus = document.getElementById("mystatus");
+      var status = document.getElementById("status");
+      mystatus.style = "display:none"; //기존 div 이름을 숨기고
+      status.type = "text"; //숨겨져있던 input을 나타낸다
+
+      var modify = document.getElementById("modify");
+      modify.style = "display:none"; //기존의 수정 버튼을 숨기고
+
+      var button = document.getElementById("ok");
+      button.style = "display"; //수정완료 버튼을 나타나게 한다
+    }
+  </script>
+  {% block script %}
+  {% endblock %}
+</body>
+
+</html>

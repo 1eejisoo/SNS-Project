@@ -1,0 +1,77 @@
+<!--글 수정을 위한 page-->
+{% extends 'layout.html' %}
+{% block content %}
+<div class="edit-twits">
+    {% for twit in twits %}
+      <div class="twit">
+        <input type="hidden" value="{{twit.User.id}}" class="twit-user-id">
+        <input type="hidden" value="{{twit.id}}" class="twit-id">
+        <div class="twit-author">{{twit.User.nick}}</div>
+        {% if not followerIdList.includes(twit.User.id) and twit.User.id !== user.id %}
+          <button class="twit-follow">팔로우하기</button>
+        {% endif %}
+        <!-- 글 수정을 위한 form -->
+        <form action="/edit{{twit.id}}" method="post">
+          <div class="edit-container">
+        <input type="text" size="80" name="content" value="{{twit.content}}" class="edit-input">
+
+        <input type="hidden" id="image_status" value="">
+
+        <input type="submit" class="modify" value="수정완료">
+        <label id="img-la" for="img">사진 업로드</label>
+        <input id="img" type="file" accept="image/*"></div>
+          <input type="hidden" name="id" value="{{twit.id}}">
+
+        <!-- 수정완료 버튼을 누르기 전까진 이미지 삭제버튼을 누르고 뒤로가기를 해도 이미지가 삭제 안되도록 하기 위한 변수값 -->
+        <input type="hidden" id="imagedelete" name="imagedelete" value="no">
+        <input type="button" id="modify" class="modify" value="사진삭제" onclick="image_delete()"> 
+          <div class="img-preview">
+            <img id="img-preview" src="" style="display: none;" width="250" alt="미리보기">
+            <input id="img-url" type="hidden" name="url">
+          </div>
+        </form>        
+
+        <div class="img-preview">
+          <img id="img-preview" src="" style="display: none;" width="250" alt="미리보기">
+          <input id="img-url" type="hidden" name="url">
+        </div>
+        {% if twit.img %}
+          <div class="twit-img" id="twitimg"><img src="{{twit.img}}" alt="섬네일"></div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    if (document.getElementById('img')) { //이미지 처리
+      document.getElementById('img').addEventListener('change', function(e) {
+        const formData = new FormData();
+        console.log(this, this.files);
+        formData.append('img', this.files[0]);
+        axios.post('/post/img', formData)
+          .then((res) => {
+            document.getElementById('imagedelete').value="";
+            document.getElementById('img-url').value = res.data.url;
+            document.getElementById('img-preview').src = res.data.url;
+            document.getElementById('img-preview').style.display = 'inline';
+            document.getElementById("twitimg").style.display = "none";
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      });
+    }
+
+    function image_delete(){
+      document.getElementById('imagedelete').value="delete";
+      if(document.getElementById('twitimg')!=null){
+        document.getElementById('twitimg').style.display="none";
+      }
+      if(document.getElementById('img-preview')!=null){
+      document.getElementById('img-preview').style.display = 'none';
+      }
+    }
+  </script>
+{% endblock %}
